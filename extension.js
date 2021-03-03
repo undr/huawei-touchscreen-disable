@@ -18,12 +18,6 @@
 
 /* exported init */
 
-const Me = imports.misc.extensionUtils.getCurrentExtension();
-
-function expandLocalPath(name) {
-  return Me.path + "/" + name;
-}
-
 const St = imports.gi.St;
 const GLib = imports.gi.GLib;
 const Clutter = imports.gi.Clutter;
@@ -33,6 +27,9 @@ const ByteArray = imports.byteArray;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const Lang = imports.lang;
+
+const StatusRegexp = new RegExp(/Device Enabled.+:\s+([0-9]+)/);
+const DeviceIdRegexp = new RegExp(/06CB:19AC.+id=([0-9]+)/);
 
 class Device {
   constructor() {
@@ -66,10 +63,9 @@ class Device {
   }
 
   __retrieveStatusCommand(deviceId) {
-    let regExp = new RegExp(/Device Enabled.+:\s+([0-9]+)/);
     let res = this.__executeCommand('xinput list-props ' + deviceId);
 
-    res = res && regExp.exec(res);
+    res = res && StatusRegexp.exec(res);
 
     if (res) {
       return res[1] == '1' ? true : false;
@@ -79,10 +75,9 @@ class Device {
   }
 
   __retrieveDeviceIdCommand() {
-    let regExp = new RegExp(/06CB:19AC.+id=([0-9]+)/);
     let res = this.__executeCommand('xinput list');
 
-    res = res && regExp.exec(res);
+    res = res && DeviceIdRegexp.exec(res);
 
     if (res) {
       return res[1];
@@ -117,24 +112,20 @@ class Device {
 }
 
 const TouchScreenMenuItem = new Lang.Class({
-	Name: 'TouchScreenMenuItem',
-	Extends: PopupMenu.PopupSwitchMenuItem,
+  Name: 'TouchScreenMenuItem',
+  Extends: PopupMenu.PopupSwitchMenuItem,
 
-	_init: function() {
+  _init: function() {
     const Gio = imports.gi.Gio;
 
     this._device = new Device();
 
     this.parent('Touch Screen', this._device.state);
 
-    // this._icon = new St.Icon({ style_class: 'popup-menu-icon' });
-    // this._icon.set_gicon(Gio.icon_new_for_string(expandLocalPath('touchscreen-symbolic.svg')));
-    // this.add_child(this._icon);
-
     this.connect('toggled', Lang.bind(this, function(object, value) {
       this._device.state ? this._device.disable() : this._device.enable();
       object.setToggleState(this._device.state);
-		}));
+    }));
   },
 
   destroy: function() {

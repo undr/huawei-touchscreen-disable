@@ -36,7 +36,7 @@ class Device {
     this.deviceId = this.__retrieveDeviceIdCommand();
 
     if (!this.deviceId) {
-      throw new Error('Cannot retrieve touch screen device ID');
+      throw new Error('[huawei-touchscreen-disable]: Cannot retrieve touch screen device ID');
     }
 
     this.updateState();
@@ -46,10 +46,10 @@ class Device {
     this.state = this.__retrieveStatusCommand(this.deviceId);
 
     if (this.state == null) {
-      throw new Error('Cannot retrieve status of touch screen device');
+      throw new Error('[huawei-touchscreen-disable]: Cannot retrieve status of touch screen device');
     }
 
-    log('[Touch Screen Button]: device state updated - ' + this.state.toString());
+    log('[huawei-touchscreen-disable]: device state updated - ' + this.state.toString());
   }
 
   enable() {
@@ -95,17 +95,19 @@ class Device {
   }
 
   __executeCommand(cmd) {
-    log('[Touch Screen Button]: execute - ' + cmd);
+    log('[huawei-touchscreen-disable]: execute - ' + cmd);
 
     let resList = GLib.spawn_command_line_sync(cmd);
     let [res, out, err, status] = resList;
 
     if (res != true || status != 0) {
-      log('[Touch Screen Button]: execute error - ' + ByteArray.toString(err));
+      log('[huawei-touchscreen-disable]: execute error - ');
+      log(ByteArray.toString(err));
       return null;
     } else {
       out = ByteArray.toString(out);
-      log('[Touch Screen Button]: execute result - ' + out);
+      log('[huawei-touchscreen-disable]: execute result - ');
+      log(out);
       return out;
     }
   }
@@ -135,18 +137,18 @@ const TouchScreenMenuItem = new Lang.Class({
 
 class Extension {
   constructor() {
-    log("[Touch Screen Button]: constructor");
+    log("[huawei-touchscreen-disable]: constructor");
   }
 
   enable() {
-    log("[Touch Screen Button]: enable");
+    log("[huawei-touchscreen-disable]: enable");
 
     this.touchScreenItem = new TouchScreenMenuItem();
     this.__addItemToSystemMenu();
   }
 
   disable() {
-    log('[Touch Screen Button]: disable')
+    log('[huawei-touchscreen-disable]: disable')
     this.touchScreenItem.destroy();
   }
 
@@ -160,6 +162,6 @@ class Extension {
 }
 
 function init() {
-  log("[Touch Screen Button]: init");
+  log("[huawei-touchscreen-disable]: init");
   return new Extension();
 }

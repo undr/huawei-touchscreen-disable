@@ -1,0 +1,8 @@
+{
+  "name": "Huawei Touchscreen Disable",
+  "description": "Disable/Enable touchscreen button for Huawei Matebook X Pro",
+  "uuid": "huawei-touchscreen-disable@undr.su",
+  "shell-version": [
+    "3.36"
+  ]
+}
